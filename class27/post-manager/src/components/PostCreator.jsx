@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { sendPost } from "../services/api";
-import { postTweet } from "../services/twitter"; // Import the Twitter API function
+import { sendTweet, uploadMedia } from "../services/twitter"; // Import the Twitter API function
 function PostCreator() {
   const [postText, setPostText] = useState("");
   const [file, setFile] = useState(null);
@@ -32,14 +32,23 @@ function PostCreator() {
   };
 
   const handleTwitterPostSubmit = async () => {
-    if (!postText) return alert("Please add text before posting to Twitter.");
+    if (!postText && !file) return alert("Please add text or media before posting.");
+    let mediaId = null;
+    if (file) {
+      const uploadResponse = await uploadMedia(file);
+      mediaId = uploadResponse.mediaId;
+    }
 
     try {
-      const response = await postTweet(postText); // Send post to Twitter);
+      const response = await sendTweet(postText, mediaId);
+            // Send post to Twitter);
       console.log("Post sent to Twitter successfully:", response);
     } catch (error) {
       console.error("Error sending post to Twitter:", error);
     }
+    setPostText("");
+    setFile(null);
+    setPreview(null);
   }
 
 return (
@@ -80,7 +89,7 @@ return (
             Delete File
         </button>
         <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md" onClick={handleTwitterPostSubmit}>
-            Post Text to Twitter
+            Post to Twitter
         </button>
         <div className="mt-6">
         <h3 className="text-lg font-semibold">Previous Posts:</h3>

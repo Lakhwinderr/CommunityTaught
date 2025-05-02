@@ -1,34 +1,23 @@
-import { TwitterApi } from "twitter-api-v2";
-import { API_KEY, API_SECRET_KEY, ACCESS_TOKEN, ACCESS_TOKEN_SECRET } from "./ssh.js";
-import { Buffer } from 'buffer';
+export async function uploadMedia(file) {
+  const formData = new FormData();// Create a new FormData object
+  formData.append("media", file);
 
-window.Buffer = Buffer;
+  const response = await fetch("http://localhost:5000/upload", {
+    method: "POST",
+    body: formData,
+  });
 
-console.log("API_KEY", API_KEY);
-const client = new TwitterApi({
-    appKey: API_KEY,
-    appSecret: API_SECRET_KEY,
-    accessToken: ACCESS_TOKEN,
-    accessSecret: ACCESS_TOKEN_SECRET,
-});
-
-
-// Ensure the TwitterApi class is properly imported and used
-if (!TwitterApi) {
-    console.error("TwitterApi is undefined. Please check your 'twitter-api-v2' installation.");
-} else {
-    console.log("TwitterApi is loaded successfully.");
+  return await response.json();
 }
 
-export async function postTweet(text) {
-    try {
-      const tweet = await client.v2.tweet(text);
-      console.log("Tweet posted successfully:", tweet);
-    } catch (error) {
-      console.error("Error posting tweet:", error);
-    }
-  }
+export async function sendTweet(postText, mediaId) {
+  const response = await fetch("http://localhost:5000/tweet", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ text: postText, mediaId }),
+  });
 
-
-
-
+  return await response.json();
+}

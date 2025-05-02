@@ -25,3 +25,4 @@ dist-ssr
 
 # Service files
 src/services/ssh.js
+.env
